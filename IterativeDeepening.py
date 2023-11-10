@@ -1,4 +1,3 @@
-# Harry Irwin, CS76, October 24th 2022
 # IterativeDeepening.py implements iterative deepening 
 # on our minimax search algorithim for our chess game
 

@@ -1,7 +1,7 @@
-# Harry Irwin, CS76, October 24th 2022
 # AlphaBetaAI.py implements a minimax search algorithim
 # with alpha beta pruning for our chess game
 
+from tkinter import N
 import chess
 import math
 import random
@@ -48,17 +48,16 @@ class AlphaBetaAI():
         self.depth += 1
         self.nodes_visited = 0
         
-        
         utility, move = self.max_value(board, -math.inf, math.inf)
-        self.transposition_table[self.hash] = utility, move, self.depth
+        #self.transposition_table[self.hash] = utility, move, self.depth
+        #print(self.transposition_table)
 
         # display the number of nodes visited and the utility of our move
         print(f"nodes visited: {self.nodes_visited}")
         print(f"utility: {utility}")
 
-
         self.update_hash(move, board)
-        
+        #print(self.transposition_table)
         return move
 
     # cutoff test returns whether or not a board is in a terminal state or not
@@ -123,37 +122,50 @@ class AlphaBetaAI():
         v = -math.inf
         movelist = self.shuffle_moves(board.legal_moves)
         move = movelist[0]
-
-        for a in movelist:        
-            # update the hash
-            old_hash = self.hash
-            #new_hash = self.update_hash(move, board)
-            
-            if self.hash in self.transposition_table:
-                if self.transposition_table[self.hash][2] <= self.depth:
+        
+        if self.hash in self.transposition_table and self.player:
+            if self.transposition_table[self.hash][2] == self.depth:
+                if self.transposition_table[self.hash][3] == 1:
                     self.skip_counter += 1
-                    v2 = self.transposition_table[self.hash][0]
-                    a2 = self.transposition_table[self.hash][1]
-            else:
-                board.push(a)
-                v2, a2 = self.min_value(board, alpha, beta)
-                self.depth += 1
-                board.pop()
+                    return self.transposition_table[self.hash][0], self.transposition_table[self.hash][1]
+                else:
+                    #self.skip_counter += 1
+                    #return self.transposition_table[self.hash][0], self.transposition_table[self.hash][1]
+                    pass
+            #movelist.insert(0, self.transposition_table[self.hash][1])
+                
+        
+        for a in movelist:        
+            
+            old_hash = self.hash
+            self.update_hash(a, board)
+            board.push(a)
+            v2, a2 = self.min_value(board, alpha, beta)
+            self.depth += 1
+            board.pop()
             
             # reverse the hash
             self.hash = old_hash
-
+            
             if v2 > v:
                 v, move = v2, a
                 alpha = max(alpha, v)
 
             if v >= beta:
+                if self.hash not in self.transposition_table:
+                    self.transposition_table[self.hash] = v, a, self.depth, 1
+                elif self.transposition_table[self.hash][2] > self.depth:
+                    self.transposition_table[self.hash] = v, a, self.depth, 1
                 return v, move
-            
+        
+        if self.hash not in self.transposition_table:
+            #self.transposition_table[self.hash] = v, move, self.depth, 2
+            pass
         return v, move
 
     # our min value function, this time modified to prune
     def min_value(self, board, alpha, beta):
+        #print(f"min {self.depth}")
         self.nodes_visited += 1
         self.depth -= 1
 
@@ -169,7 +181,7 @@ class AlphaBetaAI():
             #update the hash
             
             old_hash = self.hash
-            self.update_hash(move, board)
+            self.update_hash(a, board)
 
             board.push(a)
             v2, a2 = self.max_value(board, alpha, beta)
@@ -182,9 +194,18 @@ class AlphaBetaAI():
             if v2 < v:
                 v, move = v2, a
                 beta = min(beta, v)
-            if v <= alpha: return v, move
+            if v <= alpha: 
+                #self.transposition_table[self.hash] = v, move, self.depth, 0
+                return v, move
+        
+        #self.transposition_table[curr_hash] = v, move, self.depth, 0
         return v, move
 
 
 
     
+
+
+
+
+          

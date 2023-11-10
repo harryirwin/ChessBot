@@ -132,19 +132,35 @@ from ZobristHashing import ZobristHashing
     #print(game.board.outcome())
     #print(player1.skip_counter)
 # game.board = chess.Board(fen="1k2r2r/ppp2Q2/3p3b/2nP3p/2PN4/6PB/PP3R1P/1K6 b - - 0 1")
-player1 = AlphaBetaAI(2)
-player2 = AlphaBetaAI(2)
 
-game = ChessGame(player1, player2)
+p1 = 0
+p2 = 0
+p3 = 0
+total_skips = 0
+for _ in range(10):
+    player1 = AlphaBetaAI(3)
+    player2 = AlphaBetaAI(3)
 
-while not game.is_game_over():
-    print(game)
-    game.make_move()
-print(game.board.outcome())
-print(f"Total skips for player 1: {player1.skip_counter}")
-print(f"Total skips for player 2: {player2.skip_counter}")
+    game = ChessGame(player1, player2)
 
 
+    while not game.is_game_over():
+        print(game)
+        game.make_move()
+    print(game.board.outcome())
+    if game.board.outcome().winner:
+        p1 += 1
+    elif game.board.outcome().winner == None:
+        p3 += 1
+    else:
+        p2 += 1
+    print(f"Total skips for player 1: {player1.skip_counter}")
+    total_skips += player1.skip_counter
+
+print(p1)
+print(p2)
+print(p3)
+print(total_skips)
 
 # # Test 8: scenario 2 described in ed discussion for both minimax and alphabeta
 # # note that the moves and utilitys should be the same for both but the alphabeta should visit less nodes

@@ -1,4 +1,3 @@
-# Harry Irwin, CS76, October 24th 2022
 # MinimaxAI.py implements a minimax search algorithim
 # for our chess game
 
